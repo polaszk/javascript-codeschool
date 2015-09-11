@@ -1,5 +1,5 @@
 # javascript-codeschool
 courses:
 
-JavaScript Roadtrip - part 3
-
+1. JavaScript Roadtrip - part 3
+2. JavaScript Best Practices
