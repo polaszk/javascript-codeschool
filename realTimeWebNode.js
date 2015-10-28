@@ -55,4 +55,251 @@ http.createServer(function(request, response) {
   response.end('Hello, this is dog');
 }).listen(8080);
 
-// 2.2
+// 2.2 Chat Emitter
+var events = require('events');
+var EventEmitter = events.EventEmitter;
+var chat = new EventEmitter();
+
+chat.on('message', function(message) {
+	console.log(message);
+});
+
+// 2.3 Emitting Events
+var events = require('events');
+var EventEmitter = events.EventEmitter;
+
+var chat = new EventEmitter();
+var users = [], chatlog = [];
+
+chat.on('message', function(message) {
+  chatlog.push(message);
+});
+
+chat.on('join', function(nickname) {
+  users.push(nickname);
+});
+
+chat.emit('join', 'John');
+chat.emit('message', 'Hello!');
+
+// 2.4 Request Event
+var http = require('http');
+
+var server = http.createServer();
+server.on('request', function(request, response) {
+  response.writeHead(200);
+  response.write("Hello, this is dog");
+  response.end();
+});
+server.listen(8080);
+
+// 2.5 Listening Twice
+var http = require('http');
+
+var server = http.createServer();
+server.on('request', function(request, response) {
+  response.writeHead(200);
+  response.write("Hello, this is dog");
+  response.end();
+});
+
+server.on('request', function(request, response) {
+  console.log('New request coming in...');
+});
+
+server.listen(8080);
+
+// 2.6 Listening for Close
+var http = require('http');
+var server = http.createServer();
+
+server.on('request', function(request, response) {
+  response.writeHead(200);
+  response.write("Hello, this is dog");
+  response.end();
+});
+
+server.on('request', function(request, response) {
+  console.log("New request coming in...");
+});
+
+server.on('close', function() {
+  console.log('Closing down the server...');
+});
+
+server.listen(8080);
+
+// 3.2 File Read Stream
+var fs = require('fs');
+var file = fs.createReadStream('fruits.txt');
+file.on('readable', function() {
+	var chunk = null;
+  while (null !== (chunk = file.read())) {
+    console.log(chunk.toString());
+  }
+});
+
+// 3.3 File Piping
+var fs = require('fs');
+
+var file = fs.createReadStream('fruits.txt');
+file.pipe(process.stdout);
+
+// 3.4 Fixing Pipe
+var fs = require('fs');
+
+var file = fs.createReadStream('origin.txt');
+var destFile = fs.createWriteStream('destination.txt');
+
+file.pipe(destFile, { end: false });
+
+file.on('end', function(){
+  destFile.end('Finished!');
+});
+
+// 3.5 Download Server
+var fs = require('fs');
+var http = require('http');
+
+http.createServer(function(request, response) {
+  response.writeHead(200, {'Content-Type': 'text/html'});
+
+  var file = fs.createReadStream('index.html');
+  file.pipe(response);
+}).listen(8080);
+
+// 4.2 Missing Exports
+var highfive = function() {
+  console.log("smack!!");
+};
+
+module.exports = highfive;
+
+// 4.3 Export A Function
+// app.js
+var myRequest = require('my_request');
+myRequest('Hello, this is dog.');
+
+// my_request.js
+var http = require('http');
+
+var myRequest = function(message) {
+  var request = http.request('http://codeschool.com', function(response) {
+    response.pipe(process.stdout, { end: false });
+  });
+
+  request.write(message);
+  request.end();
+};
+
+module.exports = myRequest;
+
+// 4.4 Exporting An Object 
+var warn = function(message) {
+  console.log("Warning: " + message);
+};
+
+var info = function(message) {
+  console.log("Info: " + message);
+};
+
+var error = function(message) {
+  console.log("Error: " + message);
+};
+ 
+module.exports.info = info;
+module.exports.warn = warn;
+module.exports.error = error;
+
+// 4.5 Installing Local Modules
+npm install underscore 
+
+// 4.6 Installing Global Modules
+npm install coffee-script -g
+
+// 4.7 Dependency
+{
+  "name": "My Awesome Node App",
+  "version": "1",
+  "dependencies": {
+        "connect": "2.1.1",
+        "underscore": "1.3.3"
+  }
+}
+
+// 4.8 Semantic Versioning
+{
+  "name": "My Awesome Node App",
+  "version": "1",
+  "dependencies": {
+    "connect": "~2.2.1",
+    "underscore": "~1.3.3"
+  }
+}
+
+// 5.2 Express Routes
+var express = require('express');
+var app = express();
+
+app.get('/tweets', function(request, response) {
+  response.sendFile(__dirname + '/tweets.html');
+});
+
+app.listen(8080);
+
+// 5.3 Route Params
+var express = require('express');
+var app = express();
+
+var quotes = {
+  'einstein': 'Life is like riding a bicycle. To keep your balance you must keep moving',
+  'berners-lee': 'The Web does not just connect machines, it connects people',
+  'crockford': 'The good thing about reinventing the wheel is that you can get a round one',
+  'hofstadter': 'Which statement seems more true: (1) I have a brain. (2) I am a brain.'
+};
+
+app.get('/quotes/:name', function(request, response) {
+  response.end(quotes[request.params.name]);
+});
+
+app.listen(8080);
+
+// 5.4 Rendering
+// quote.ejs 
+<h2>Quote by <%= name %></h2>
+<blockquote>
+  <%= quote %>
+</blockquote>
+
+// app.js
+var express = require('express');
+var app = express();
+
+var quotes = {
+  'einstein': 'Life is like riding a bicycle. To keep your balance you must keep moving',
+  'berners-lee': 'The Web does not just connect machines, it connects people',
+  'crockford': 'The good thing about reinventing the wheel is that you can get a round one',
+  'hofstadter': 'Which statement seems more true: (1) I have a brain. (2) I am a brain.'
+};
+
+app.get('/quotes/:name', function(req, res) {
+  var quote = quotes[req.params.name];
+  res.locals = {name: req.params.name, quote: quote};
+  res.render('quote.ejs');
+  
+});
+
+app.listen(8080);
+
+// 5.5 URL Building
+var url = require('url');
+
+options = {
+  protocol: 'http:',
+  host: 'search.twitter.com',
+  pathname: '/search.json?q=codeschool',
+  query: { q: 'codeschool' }
+};
+
+var searchURL = url.format(options);
+console.log(searchURL);
