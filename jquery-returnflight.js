@@ -413,7 +413,7 @@ $('.update-available-flights').on('click', function() {
 $('.update-available-flights').on('click', function() {
   $.getJSON('/flights/late', function(result) {
     var flightElements = $.map(result, function(flightItem, index){
-      var flightEl = $('<li>'+flightItem.flightNumber+'-'+flightItem.time+'</li>');
+      var flightEl = $('<li>' + flightItem.flightNumber + '-' + flightItem.time+'</li>');
       return flightEl;
     });
     $('.flight-times').detach().html(flightElements).appendTo('.flights');
@@ -445,7 +445,7 @@ $(document).ready(function(){
   $('button').on('click.photos', function() {
     var tour = $(this).closest('li');
     var results = tour.find('.results');
-    results.append('<p><img src="/assets/photos/'+tour.data('loc')+'.jpg" /></p>');
+    results.append('<p><img src="/assets/photos/' + tour.data('loc') + '.jpg" /></p>');
     $(this).off('click.photos');
   });
 });
@@ -465,7 +465,7 @@ $(document).ready(function(){
   $('button').on('click.photos', function() {
     var tour = $(this).closest('li');
     var results = tour.find('.results');
-    results.append('<p><img src="/assets/photos/'+tour.data('loc')+'.jpg" /></p>');
+    results.append('<p><img src="/assets/photos/' + tour.data('loc') + '.jpg" /></p>');
     $(this).off('click.photos');
   });
 });
@@ -483,7 +483,7 @@ $(document).ready(function(){
   $('button').on('click.photos', function() {
     var tour = $(this).closest('li');
     var results = tour.find('.results');
-    results.append('<p><img src="/assets/photos/'+tour.data('loc')+'.jpg" /></p>');
+    results.append('<p><img src="/assets/photos/' + tour.data('loc') + '.jpg" /></p>');
     $(this).off('click.photos');
     $(this).trigger('show.weather');
   });
