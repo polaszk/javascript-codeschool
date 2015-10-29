@@ -10,7 +10,7 @@ $(document).ready(function() {
 $(document).ready(function() {
   $('#tour').on('click', 'button', function() {
     $.ajax('/photos.html', {
-      success: function(result){
+      success: function(result) {
       	$('.photos').html(result).fadeIn();
       }
     });
@@ -281,7 +281,7 @@ $(document).ready(function() {
 
 // 3.3 Form Submit Event
 $(document).ready(function() {
-  $('form').on('submit', function(event){
+  $('form').on('submit', function(event) {
   	event.preventDefault();
   });
 });
@@ -399,7 +399,7 @@ $('.update-available-flights').on('click', function() {
 // 4.7 Using $.map() II
 $('.update-available-flights').on('click', function() {
   $.getJSON('/flights/late', function(result) {
-    var flightElements = $.map(result, function(flightItem, index){
+    var flightElements = $.map(result, function(flightItem, index) {
       var listElem = $('<li></li>');
       listElem.append('<h3>' + flightItem.flightNumber + '</h3>');
       listElem.append('<p>' + flightItem.time + '</p>');
@@ -412,7 +412,7 @@ $('.update-available-flights').on('click', function() {
 // 4.8 detach()
 $('.update-available-flights').on('click', function() {
   $.getJSON('/flights/late', function(result) {
-    var flightElements = $.map(result, function(flightItem, index){
+    var flightElements = $.map(result, function(flightItem, index) {
       var flightEl = $('<li>' + flightItem.flightNumber + '-' + flightItem.time+'</li>');
       return flightEl;
     });
@@ -421,7 +421,7 @@ $('.update-available-flights').on('click', function() {
 });
 
 // 5.3 Removing Event Handlers
-$(document).ready(function(){
+$(document).ready(function() {
   // Get Weather
   $('button').on('click', function() {
     var results = $(this).closest('li').find('.results');
@@ -432,7 +432,7 @@ $(document).ready(function(){
 });
 
 // 5.4 Namespacing Event Handlers
-$(document).ready(function(){
+$(document).ready(function() {
   // Get Weather
   $('button').on('click.weather', function() {
     var results = $(this).closest('li').find('.results');
@@ -451,7 +451,7 @@ $(document).ready(function(){
 });
 
 // 5.5 Trigger
-$(document).ready(function(){
+$(document).ready(function() {
   $('button').trigger('click');
 
   // Get Weather
@@ -471,7 +471,7 @@ $(document).ready(function(){
 });
 
 // 5.6 Custom Events
-$(document).ready(function(){
+$(document).ready(function() {
   // Get Weather
   $('button').on('show.weather', function() {
     var results = $(this).closest('li').find('.results');
@@ -489,4 +489,99 @@ $(document).ready(function(){
   });
 });
 
-//
+// 5.7 - 5.13
+
+// 6.3 Reusable AJAX
+var Vacation = {
+  getPrice: function(location) {
+   var promise = $.ajax('/vacation/prices', {
+     data: {q: location}
+   });
+
+   return promise;
+  }
+}
+
+// 6.4 Using the Vacation
+$(document).ready(function() {
+  $('button').on('click', function() {
+    var location = $('.location').text();
+		var pricePromise = Vacation.getPrice(location);
+    pricePromise.done(function(result) {
+      $('.price').text(result.price);
+    });
+  });
+});
+
+// 6.5 Simplifying the result
+var Vacation = {
+  getPrice: function(location) {
+   var promise = $.Deferred();
+   
+   $.ajax('/vacation/prices', {
+     data: {q: location},
+     success: function(result) {
+     	promise.resolve(result.price);
+     }
+   });
+
+   return promise;
+  }
+}
+
+// 6.6 The Simple Result
+$(document).ready(function() {
+  $('button').on('click', function() {
+    var location = $('.location').text();
+    Vacation.getPrice(location).done(function(result) {
+      $('.price').text(result);
+    });
+  });
+});
+
+// 6.7 Promising Errors
+var Vacation = {
+  getPrice: function(location) {
+    var promise = $.Deferred();
+    $.ajax('/vacation/prices', {
+      data: {q: location},
+      success: function(result) {
+        promise.resolve(result.price);
+      },
+      error: function() {
+      	var error = 'error';
+        promise.reject(error);
+      }
+    });
+    return promise;
+  }
+}
+
+// 6.8 Fail()
+$(document).ready(function() {
+  $('button').on('click', function() {
+    var location = $('.location').text();
+    Vacation.getPrice(location).done(function(result) {
+      $('.price').text(result);
+    }).fail(function(error) {
+      	console.log(error);
+    });
+  });
+});
+
+// 6.9 When() and Then()
+$(document).ready(function() {
+  $('button').on('click', function() {
+    var tour = $(this).parent();
+    var location = tour.data('location');
+    var resultDiv = tour.find('.results').empty();
+    
+    $.when(
+      Vacation.getPrice(location),
+      Photo.getPhoto(location)
+    ).then(function(priceResult, photoResult) {
+      $('<p>$'+priceResult+'</p>').appendTo(resultDiv);
+      $('<img />').attr('src', photoResult).appendTo(resultDiv);
+    });
+  });
+});
