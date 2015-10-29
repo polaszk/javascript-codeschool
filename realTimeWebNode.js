@@ -303,3 +303,140 @@ options = {
 
 var searchURL = url.format(options);
 console.log(searchURL);
+
+// 5.6 Doing the Request
+var url = require('url');
+
+var options = {
+  protocol: "http:",
+  host: "search.twitter.com",
+  pathname: '/search.json',
+  query: { q: "codeschool"}
+};
+
+var searchURL = url.format(options);
+var request = require('request');
+request(searchURL, function(error, response, body) {
+  console.log(body);
+});
+
+// 5.7 Express Server
+var url = require('url');
+var request = require('request');
+var express = require('express');
+var options = {
+  protocol: "http:",
+  host: "search.twitter.com",
+  pathname: '/search.json',
+  query: {
+    q: "codeschool"
+  }
+};
+var searchURL = url.format(options);
+var app = express();
+
+app.get('/', function(req, res) {
+  request(searchURL).pipe(res);
+});
+
+app.listen(8080);
+
+// 6.2 Setting Up socket.io Server-Side
+var express = require('express');
+var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
+
+io.on('connection', function(client) {
+  console.log('Client connected');
+});
+
+server.listen(8080);
+
+// 6.3 Client socket.io Setup
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io.connect('http://localhost:8080');
+</script>
+
+// 6.4 Listening For Questions
+<script src="/socket.io/socket.io.js"></script>
+<script src="/insertQuestion.js"></script>
+
+<script>
+  var server = io.connect('http://localhost:8080');
+  
+  server.on('question', function(data) {
+    insertQuestion(data);
+  });         
+</script>
+
+// 6.5 Broadcasting Questions
+var express = require('express');
+var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
+
+io.on('connection', function(client) {
+  console.log("Client connected...");
+  client.on('question', function(data) {
+    client.broadcast.emit('question', data);
+  });
+});
+
+server.listen(8080);
+
+// 6.6 Saving Client Data
+var express = require('express');
+var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
+
+io.on('connection', function(client) {
+  console.log("Client connected...");
+
+  client.on('question', function(question) {
+    if (!client.question_asked) {
+      client.question_asked = true;
+      client.broadcast.emit('question', question);
+    }
+  });
+});
+
+server.listen(8080);
+
+// 6.7 Answering Questions
+var express = require('express');
+var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
+
+io.sockets.on('connection', function(client) {
+  console.log("Client connected...");
+  
+  client.on('answer', function(question, answer) {
+    client.broadcast.emit('answer', question, answer);
+  });
+
+  client.on('question', function(question) {
+    if(!client.question_asked) {
+      client.question_asked = true;
+      client.broadcast.emit('question', question);
+    }
+  });
+});
+
+server.listen(8080);
+
+// 6.8 Answering Question Client
+var server = io.connect('http://localhost:8080');
+
+server.on('question', function(question) {
+  insertQuestion(question);
+});
+
+server.on('answer', function(question, answer) {
+  answerQuestion(question, answer);
+});
+
+//
